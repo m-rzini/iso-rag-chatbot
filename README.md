@@ -73,36 +73,57 @@ iso-rag-chatbot/
 
 - Python 3.10+
 - Node.js 18+
-- Cohere API key (free at [cohere.com](https://cohere.com))
+- **Cohere API key** — obligatoire, obtenir une clé gratuite sur [cohere.com](https://cohere.com)
 
-### Backend
+### 1. Cloner le dépôt
+
+```bash
+git clone https://github.com/m-rzini/rag-iso9001.git
+cd rag-iso9001
+```
+
+### 2. Backend
 
 ```bash
 cd backend
 python -m venv .venv
 source .venv/bin/activate        # Windows: .venv\Scripts\Activate.ps1
 pip install -r requirements.txt
-cp .env.example .env             # fill in your API keys
+cp .env.example .env
+```
+
+Ouvrez `backend/.env` et renseignez votre clé Cohere :
+
+```
+COHERE_API_KEY=your_cohere_api_key   # ← obligatoire
+ALLOWED_ORIGINS=http://localhost:5173
+```
+
+Puis lancez le serveur :
+
+```bash
 uvicorn main:app --reload
 ```
 
-### Frontend
+### 3. Frontend
+
+Dans un second terminal :
 
 ```bash
 cd frontend
-cp .env.example .env             # set VITE_API_URL=http://localhost:8000
+cp .env.example .env             # VITE_API_URL=http://localhost:8000 (déjà configuré)
 npm install
 npm run dev
 ```
 
-Open http://localhost:5173
+Ouvrez http://localhost:5173
 
 ## Environment Variables
 
 ### Backend `.env`
 
 ```
-COHERE_API_KEY=your_cohere_api_key
+COHERE_API_KEY=your_cohere_api_key   # clé API Cohere (obligatoire)
 ALLOWED_ORIGINS=http://localhost:5173
 ```
 
