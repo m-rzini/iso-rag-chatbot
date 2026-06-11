@@ -54,20 +54,23 @@ def build_retriever(pdf_path: str) -> tuple:
 
 
 def generate_questions(pages: list) -> list[str]:
-    sample = "\n\n".join(p.page_content for p in pages[:5])[:3000]
-    llm = ChatGroq(model="llama-3.3-70b-versatile")
-    prompt = (
-        "Tu es un assistant expert en analyse de documents. "
-        "Voici un extrait du document :\n\n"
-        f"{sample}\n\n"
-        "Génère exactement 3 questions pertinentes et concises qu'un utilisateur pourrait poser sur ce document. "
-        "Réponds UNIQUEMENT avec un tableau JSON de 3 chaînes, sans aucun autre texte. "
-        'Exemple : ["Question 1 ?", "Question 2 ?", "Question 3 ?"]'
-    )
-    response = llm.invoke(prompt).content.strip()
-    match = re.search(r'\[.*?\]', response, re.DOTALL)
-    if match:
-        return json.loads(match.group())
+    try:
+        sample = "\n\n".join(p.page_content for p in pages[:5])[:3000]
+        llm = ChatGroq(model="llama-3.3-70b-versatile")
+        prompt = (
+            "Tu es un assistant expert en analyse de documents. "
+            "Voici un extrait du document :\n\n"
+            f"{sample}\n\n"
+            "Génère exactement 3 questions pertinentes et concises qu'un utilisateur pourrait poser sur ce document. "
+            "Réponds UNIQUEMENT avec un tableau JSON de 3 chaînes, sans aucun autre texte. "
+            'Exemple : ["Question 1 ?", "Question 2 ?", "Question 3 ?"]'
+        )
+        response = llm.invoke(prompt).content.strip()
+        match = re.search(r'\[.*?\]', response, re.DOTALL)
+        if match:
+            return json.loads(match.group())
+    except Exception:
+        pass
     return []
 
 
