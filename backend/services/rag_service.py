@@ -4,7 +4,7 @@ import re
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.retrievers import BM25Retriever
 from langchain_community.vectorstores import FAISS
-from langchain_community.embeddings.fastembed import FastEmbedEmbeddings
+from langchain_cohere import CohereEmbeddings
 from langchain.retrievers import EnsembleRetriever
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
@@ -38,7 +38,10 @@ def build_retriever(pdf_path: str) -> tuple:
     bm25_retriever = BM25Retriever.from_documents(pages)
     bm25_retriever.k = 2
 
-    embedding_model = FastEmbedEmbeddings(model_name="BAAI/bge-small-en-v1.5")
+    embedding_model = CohereEmbeddings(
+        cohere_api_key=os.getenv("COHERE_API_KEY"),
+        model="embed-multilingual-light-v3.0",
+    )
     faiss_db = FAISS.from_documents(pages, embedding_model)
     faiss_retriever = faiss_db.as_retriever(search_kwargs={"k": 2})
 
