@@ -56,7 +56,7 @@ def build_retriever(pdf_path: str) -> tuple:
 def generate_questions(pages: list) -> list[str]:
     try:
         sample = "\n\n".join(p.page_content for p in pages[:5])[:3000]
-        llm = ChatCohere(model="command-r-plus", cohere_api_key=os.getenv("COHERE_API_KEY"))
+        llm = ChatCohere(model="command-r-plus-08-2024", cohere_api_key=os.getenv("COHERE_API_KEY"))
         prompt = (
             "Tu es un assistant expert en analyse de documents. "
             "Voici un extrait du document :\n\n"
@@ -75,7 +75,7 @@ def generate_questions(pages: list) -> list[str]:
 
 
 def ask(query: str, retriever) -> str:
-    llm = ChatCohere(model="command-r-plus", cohere_api_key=os.getenv("COHERE_API_KEY"))
+    llm = ChatCohere(model="command-r-plus-08-2024", cohere_api_key=os.getenv("COHERE_API_KEY"))
     qa = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
