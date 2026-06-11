@@ -9,4 +9,4 @@ rank-bm25==0.2.2
 pypdf
 python-dotenv
 groq
-fastembed==0.3.6
+fastembed
