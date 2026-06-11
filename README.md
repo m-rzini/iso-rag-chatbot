@@ -16,7 +16,7 @@ A RAG (Retrieval-Augmented Generation) chatbot that lets you upload any PDF and 
 - Multilingual support (French, English, Arabic, and more)
 - Auto-generated suggested questions based on the document content
 - Markdown rendering for LLM responses
-- Strict system prompt — answers only from the uploaded document
+- Smart system prompt — prioritizes the uploaded document, complements with ISO 9001 / quality management expertise, and rejects off-topic questions
 
 ## Architecture
 
