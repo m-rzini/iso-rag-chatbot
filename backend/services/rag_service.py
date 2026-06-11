@@ -36,14 +36,23 @@ def build_retriever(pdf_path: str) -> tuple:
     pages = loader.load_and_split()
 
     bm25_retriever = BM25Retriever.from_documents(pages)
-    bm25_retriever.k = 2
+    bm25_retriever.k = 3
 
     embedding_model = CohereEmbeddings(
         cohere_api_key=os.getenv("COHERE_API_KEY"),
-        model="embed-multilingual-light-v3.0",
+        model="embed-multilingual-v3.0",
+        input_type="search_document",
+    )
+    query_embedding_model = CohereEmbeddings(
+        cohere_api_key=os.getenv("COHERE_API_KEY"),
+        model="embed-multilingual-v3.0",
+        input_type="search_query",
     )
     faiss_db = FAISS.from_documents(pages, embedding_model)
-    faiss_retriever = faiss_db.as_retriever(search_kwargs={"k": 2})
+    faiss_retriever = faiss_db.as_retriever(
+        search_kwargs={"k": 3},
+        embedding=query_embedding_model,
+    )
 
     ensemble_retriever = EnsembleRetriever(
         retrievers=[bm25_retriever, faiss_retriever],
