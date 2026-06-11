@@ -8,9 +8,14 @@ interface Message {
   content: string;
 }
 
+const SUGGESTED_QUESTIONS = [
+  "Comment établir une politique qualité ?",
+  "Que dit la norme sur les références normatives ?",
+  "Quelles sont les exigences concernant les besoins et attentes des parties intéressées ?",
+];
+
 interface Props {
   sessionId: string | null;
-  suggestedQuestions: string[];
 }
 
 function Spinner() {
@@ -22,7 +27,7 @@ function Spinner() {
   );
 }
 
-export default function ChatPanel({ sessionId, suggestedQuestions }: Props) {
+export default function ChatPanel({ sessionId }: Props) {
   const [messages, setMessages] = useState<Message[]>([]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -72,9 +77,9 @@ export default function ChatPanel({ sessionId, suggestedQuestions }: Props) {
                   : "Chargez un PDF à gauche pour commencer."}
               </p>
             </div>
-            {sessionId && suggestedQuestions.length > 0 && (
+            {sessionId && (
               <div className="flex flex-wrap gap-2 justify-center">
-                {suggestedQuestions.map((q) => (
+                {SUGGESTED_QUESTIONS.map((q) => (
                   <button
                     key={q}
                     onClick={() => submit(q)}

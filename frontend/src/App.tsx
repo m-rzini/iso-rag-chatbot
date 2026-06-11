@@ -5,12 +5,10 @@ import PdfUploader from "./components/PdfUploader";
 export default function App() {
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [pageCount, setPageCount] = useState<number | null>(null);
-  const [suggestedQuestions, setSuggestedQuestions] = useState<string[]>([]);
 
-  function handleUploadSuccess(sid: string, pages: number, questions: string[]) {
+  function handleUploadSuccess(sid: string, pages: number) {
     setSessionId(sid);
     setPageCount(pages);
-    setSuggestedQuestions(questions);
   }
 
   return (
@@ -57,7 +55,7 @@ export default function App() {
           </span>
         </div>
         <div className="flex-1 min-h-0">
-          <ChatPanel sessionId={sessionId} suggestedQuestions={suggestedQuestions} />
+          <ChatPanel sessionId={sessionId} />
         </div>
       </div>
     </div>

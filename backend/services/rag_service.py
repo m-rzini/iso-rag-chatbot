@@ -1,6 +1,4 @@
-import json
 import os
-import re
 from langchain_community.document_loaders import PyPDFLoader
 from langchain_community.retrievers import BM25Retriever
 from langchain_community.vectorstores import FAISS
@@ -55,28 +53,8 @@ def build_retriever(pdf_path: str) -> tuple:
         weights=[0.4, 0.6],
     )
 
-    return ensemble_retriever, len(pages), pages
+    return ensemble_retriever, len(pages)
 
-
-def generate_questions(pages: list) -> list[str]:
-    try:
-        sample = "\n\n".join(p.page_content for p in pages[:5])[:3000]
-        llm = ChatCohere(model="command-r-plus-08-2024", cohere_api_key=os.getenv("COHERE_API_KEY"))
-        prompt = (
-            "Tu es un assistant expert en analyse de documents. "
-            "Voici un extrait du document :\n\n"
-            f"{sample}\n\n"
-            "Génère exactement 3 questions pertinentes et concises qu'un utilisateur pourrait poser sur ce document. "
-            "Réponds UNIQUEMENT avec un tableau JSON de 3 chaînes, sans aucun autre texte. "
-            'Exemple : ["Question 1 ?", "Question 2 ?", "Question 3 ?"]'
-        )
-        response = llm.invoke(prompt).content.strip()
-        match = re.search(r'\[.*?\]', response, re.DOTALL)
-        if match:
-            return json.loads(match.group())
-    except Exception:
-        pass
-    return []
 
 
 def ask(query: str, retriever) -> str:

@@ -3,11 +3,11 @@ import os
 import uuid
 
 from dotenv import load_dotenv
-from fastapi import BackgroundTasks, FastAPI, HTTPException, UploadFile
+from fastapi import FastAPI, HTTPException, UploadFile
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 
-from services.rag_service import ask, build_retriever, generate_questions
+from services.rag_service import ask, build_retriever
 
 load_dotenv()
 
@@ -29,7 +29,6 @@ app.add_middleware(
 
 os.makedirs("uploads", exist_ok=True)
 app.state.retrievers: dict = {}
-app.state.questions: dict = {}  # session_id -> list[str] | None (None = still processing)
 
 
 class ChatRequest(BaseModel):
@@ -42,13 +41,8 @@ async def health():
     return {"status": "ok"}
 
 
-async def _build_questions(session_id: str, pages: list):
-    questions = await asyncio.to_thread(generate_questions, pages)
-    app.state.questions[session_id] = questions
-
-
 @app.post("/api/upload")
-async def upload_pdf(file: UploadFile, background_tasks: BackgroundTasks):
+async def upload_pdf(file: UploadFile):
     if not file.filename or not file.filename.lower().endswith(".pdf"):
         raise HTTPException(status_code=400, detail="Only PDF files are accepted.")
 
@@ -60,21 +54,10 @@ async def upload_pdf(file: UploadFile, background_tasks: BackgroundTasks):
     with open(pdf_path, "wb") as f:
         f.write(contents)
 
-    retriever, page_count, pages = await asyncio.to_thread(build_retriever, pdf_path)
+    retriever, page_count = await asyncio.to_thread(build_retriever, pdf_path)
     app.state.retrievers[session_id] = retriever
-    app.state.questions[session_id] = None  # generation in progress
 
-    background_tasks.add_task(_build_questions, session_id, pages)
-
-    return {"session_id": session_id, "page_count": page_count, "suggested_questions": []}
-
-
-@app.get("/api/questions/{session_id}")
-async def get_questions(session_id: str):
-    if session_id not in app.state.questions:
-        raise HTTPException(status_code=404, detail="Session not found.")
-    questions = app.state.questions[session_id]
-    return {"ready": questions is not None, "suggested_questions": questions or []}
+    return {"session_id": session_id, "page_count": page_count}
 
 
 @app.post("/api/chat")

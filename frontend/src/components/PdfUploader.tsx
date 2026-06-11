@@ -2,7 +2,7 @@ import React, { useRef, useState } from "react";
 import { uploadPdf } from "../api/client";
 
 interface Props {
-  onUploadSuccess: (sessionId: string, pageCount: number, questions: string[]) => void;
+  onUploadSuccess: (sessionId: string, pageCount: number) => void;
 }
 
 type State = "idle" | "uploading" | "done" | "error";
@@ -25,10 +25,10 @@ export default function PdfUploader({ onUploadSuccess }: Props) {
     setState("uploading");
     setErrorMsg("");
     try {
-      const { session_id, page_count, suggested_questions } = await uploadPdf(file);
+      const { session_id, page_count } = await uploadPdf(file);
       setPageCount(page_count);
       setState("done");
-      onUploadSuccess(session_id, page_count, suggested_questions ?? []);
+      onUploadSuccess(session_id, page_count);
     } catch (e) {
       setErrorMsg(e instanceof Error ? e.message : "Upload failed");
       setState("error");
