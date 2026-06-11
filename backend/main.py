@@ -68,5 +68,8 @@ async def chat(req: ChatRequest):
     if retriever is None:
         raise HTTPException(status_code=404, detail="Session not found. Please upload a PDF first.")
 
-    answer = await asyncio.to_thread(ask, req.question, retriever)
-    return {"answer": answer}
+    try:
+        answer = await asyncio.to_thread(ask, req.question, retriever)
+        return {"answer": answer}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))

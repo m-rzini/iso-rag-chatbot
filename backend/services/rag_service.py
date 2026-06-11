@@ -8,7 +8,7 @@ from langchain_cohere import CohereEmbeddings
 from langchain.retrievers import EnsembleRetriever
 from langchain.chains import RetrievalQA
 from langchain.prompts import PromptTemplate
-from langchain_groq import ChatGroq
+from langchain_cohere import ChatCohere
 
 _SYSTEM_PROMPT = PromptTemplate(
     input_variables=["context", "question"],
@@ -56,7 +56,7 @@ def build_retriever(pdf_path: str) -> tuple:
 def generate_questions(pages: list) -> list[str]:
     try:
         sample = "\n\n".join(p.page_content for p in pages[:5])[:3000]
-        llm = ChatGroq(model="llama-3.3-70b-versatile")
+        llm = ChatCohere(model="command-r-plus", cohere_api_key=os.getenv("COHERE_API_KEY"))
         prompt = (
             "Tu es un assistant expert en analyse de documents. "
             "Voici un extrait du document :\n\n"
@@ -75,7 +75,7 @@ def generate_questions(pages: list) -> list[str]:
 
 
 def ask(query: str, retriever) -> str:
-    llm = ChatGroq(model="llama-3.3-70b-versatile")
+    llm = ChatCohere(model="command-r-plus", cohere_api_key=os.getenv("COHERE_API_KEY"))
     qa = RetrievalQA.from_chain_type(
         llm=llm,
         chain_type="stuff",
